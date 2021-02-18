@@ -8,14 +8,6 @@ const dhl = require('postman-request');
 const express = require('express');
 const app = express();
 const http = require('http');
-const bodyParser = require('body-parser');
-const cors = require('cors');
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-app.use(cors({
-  origin: "https://alleshusos.de",
-  optionsSuccessStatus: 200
-}))
 
 process.on('message', (msg) => {
   // handle messages from parent
@@ -60,6 +52,33 @@ function loadConfig(og=false) {
   }
 }
 let config = loadConfig();
+
+const https = require('https');
+const privateKey = config.ssl.PATHTO_privateKey;
+const certificate = this.config.ssl.PATHTO_certificate;
+const ca = this.config.ssl.PATHTO_ca;
+const credentials = {
+  key: privateKey,
+  cert: certificate,
+  ca: ca
+}
+const bodyParser = require('body-parser');
+const cors = require('cors');
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(cors({
+  origin: "https://alleshusos.de",
+  optionsSuccessStatus: 200
+}))
+const redirect = app.use("*", (req, res) => {
+  res.redirect("https://"+req.headers.host + req.url);
+});
+http.createServer(redirect).listen(80, () => {
+  console.log("redirecting http traffic!")
+})
+https.createServer(credentials, app).listen(443, () => {
+  console.log("Server running on https://localhost:443");
+});
 
 function writeConfig(settings) {
   const config = loadConfig(true)
