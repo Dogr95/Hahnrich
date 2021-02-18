@@ -36,6 +36,11 @@ function loadConfig(og=false) {
   let cfg = JSON.parse(F.readFileSync('config.json'));
   if(!cfg.pluginSettings.twitch) {
     cfg.pluginSettings.twitch = {
+      ssl: {
+        PATHTO_privateKey: "",
+        PATHTO_certificate: "",
+        PATHTO_ca: ""
+      },
       clientID: "",
       accessToken: "",
       clientSecret: "",
@@ -55,8 +60,8 @@ let config = loadConfig();
 
 const https = require('https');
 const privateKey = config.ssl.PATHTO_privateKey;
-const certificate = this.config.ssl.PATHTO_certificate;
-const ca = this.config.ssl.PATHTO_ca;
+const certificate = config.ssl.PATHTO_certificate;
+const ca = config.ssl.PATHTO_ca;
 const credentials = {
   key: privateKey,
   cert: certificate,
