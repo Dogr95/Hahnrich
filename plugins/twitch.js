@@ -238,8 +238,9 @@ const cors = require('cors');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cors({
-  origin: "*",
-  optionsSuccessStatus: 200
+  origin: "https://alleshusos.de/",
+  optionsSuccessStatus: 200,
+  credentials: true
 }))
 https.createServer(credentials, app).listen(8080, () => {
   console.log("Server running on https://localhost:8080");
