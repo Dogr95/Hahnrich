@@ -57,27 +57,6 @@ function loadConfig(og=false) {
 }
 let config = loadConfig();
 
-const https = require('https');
-const privateKey = F.readFileSync(config.ssl.PATHTO_privateKey, 'utf8');
-const certificate = F.readFileSync(config.ssl.PATHTO_certificate, 'utf8');
-const ca = F.readFileSync(config.ssl.PATHTO_ca, 'utf8');
-const credentials = {
-  key: privateKey,
-  cert: certificate,
-  ca: ca
-}
-const bodyParser = require('body-parser');
-const cors = require('cors');
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-app.use(cors({
-  origin: "https://alleshusos.de",
-  optionsSuccessStatus: 200
-}))
-https.createServer(credentials, app).listen(8080, () => {
-  console.log("Server running on https://localhost:443");
-});
-
 function writeConfig(settings) {
   const config = loadConfig(true)
   config.pluginSettings.twitch = settings
@@ -245,7 +224,26 @@ app.post('/followsto/:name', (req, res) => {
     res.send({"error": 'invalid request'})
   }
 })
-http.createServer(app).listen(8080)
+const https = require('https');
+const privateKey = F.readFileSync(config.ssl.PATHTO_privateKey, 'utf8');
+const certificate = F.readFileSync(config.ssl.PATHTO_certificate, 'utf8');
+const ca = F.readFileSync(config.ssl.PATHTO_ca, 'utf8');
+const credentials = {
+  key: privateKey,
+  cert: certificate,
+  ca: ca
+}
+const bodyParser = require('body-parser');
+const cors = require('cors');
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(cors({
+  origin: "https://alleshusos.de",
+  optionsSuccessStatus: 200
+}))
+https.createServer(credentials, app).listen(8080, () => {
+  console.log("Server running on https://localhost:443");
+});
 
 // start chat client
 const chat = new ChatClient(mainProvider, { channels: config.channels })
