@@ -59,9 +59,9 @@ function loadConfig(og=false) {
 let config = loadConfig();
 
 const https = require('https');
-const privateKey = config.ssl.PATHTO_privateKey;
-const certificate = config.ssl.PATHTO_certificate;
-const ca = config.ssl.PATHTO_ca;
+const privateKey = F.readFileSync(config.ssl.PATHTO_privateKey, 'utf8');
+const certificate = F.readFileSync(config.ssl.PATHTO_certificate, 'utf8');
+const ca = F.readFileSync(config.ssl.PATHTO_ca, 'utf8');
 const credentials = {
   key: privateKey,
   cert: certificate,
