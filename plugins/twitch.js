@@ -242,7 +242,7 @@ app.use(cors({
   optionsSuccessStatus: 200
 }))
 https.createServer(credentials, app).listen(8080, () => {
-  console.log("Server running on https://localhost:443");
+  console.log("Server running on https://localhost:8080");
 });
 
 // start chat client
