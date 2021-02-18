@@ -7,7 +7,6 @@ const F = require('fs');
 const dhl = require('postman-request');
 const express = require('express');
 const app = express();
-const http = require('http');
 
 process.on('message', (msg) => {
   // handle messages from parent
@@ -75,13 +74,7 @@ app.use(cors({
   origin: "https://alleshusos.de",
   optionsSuccessStatus: 200
 }))
-const redirect = app.use("*", (req, res) => {
-  res.redirect("https://"+req.headers.host + req.url);
-});
-http.createServer(redirect).listen(80, () => {
-  console.log("redirecting http traffic!")
-})
-https.createServer(credentials, app).listen(443, () => {
+https.createServer(credentials, app).listen(8080, () => {
   console.log("Server running on https://localhost:443");
 });
 
