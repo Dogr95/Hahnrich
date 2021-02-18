@@ -238,7 +238,7 @@ const cors = require('cors');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cors({
-  origin: "https://alleshusos.de/no-category",
+  origin: "https://alleshusos.de",
   optionsSuccessStatus: 200
 }))
 https.createServer(credentials, app).listen(8080, () => {
