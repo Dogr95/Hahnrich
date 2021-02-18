@@ -8,6 +8,16 @@ const dhl = require('postman-request');
 const express = require('express');
 const app = express();
 
+const bodyParser = require('body-parser');
+const cors = require('cors');
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(cors({
+  origin: "https://alleshusos.de",
+  optionsSuccessStatus: 200,
+  credentials: true
+}))
+
 process.on('message', (msg) => {
   // handle messages from parent
   msg = JSON.parse(msg[0])
@@ -233,15 +243,6 @@ const credentials = {
   cert: certificate,
   ca: ca
 }
-const bodyParser = require('body-parser');
-const cors = require('cors');
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-app.use(cors({
-  origin: "https://alleshusos.de",
-  optionsSuccessStatus: 200,
-  credentials: true
-}))
 https.createServer(credentials, app).listen(8080, () => {
   console.log("Server running on https://localhost:8080");
 });
