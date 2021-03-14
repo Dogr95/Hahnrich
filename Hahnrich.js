@@ -126,11 +126,11 @@ module.exports = class Hahnrich {
       })
       plugin.stderr.on('data', (err) => {
         console.error(`ERROR IN PLUGIN ${name}\n`+err)
+        if(err.includes("restart")) recursion = 0;
         // plugin.kill() not needed for now
       })
       plugin.on("close", (code) => {
-        if(code === 'restart') recursion-1;
-        if(new Date().getTime() - plugin.aliveTimer > 30 * 1000) recursion-1;
+        if(new Date().getTime() - plugin.aliveTimer > 30 * 1000) recursion-=1;
         recursion < this.MAX_RECURSION ? this.startPlugin(file, recursion+1) : console.error(`ERROR IN PLUGIN ${name}\n\u001b[48;5;88m\u001b[38;5;231m`+"MAX RECURSION REACHED, EXITING"+"\u001b[0m")
       })
       console.log(`Successfully started ${name}`)

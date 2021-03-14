@@ -16,7 +16,8 @@ function loadConfig(og=false) {
   let cfg = JSON.parse(F.readFileSync('config.json'));
   if(!cfg.pluginSettings.discord) {
     cfg.pluginSettings.discord = {
-      token: ""
+      token: "",
+      ownerId: 0
     }
     F.writeFileSync('config.json', JSON.stringify(cfg, null, 4))
     return og ? cfg : cfg.pluginSettings.discord;
@@ -58,7 +59,7 @@ client.on('ready', () => {
 })
 
 client.on('message', message => {
-  if(message.channel['type'] !== 'dm') {
+  if(message.channel['type'] !== 'dm' && message.channel.name.includes("bot")) {
     if(message.attachments.first()) {
       message.attachments.each(file => {
         console.log(file)
@@ -95,6 +96,12 @@ client.on('message', message => {
       if(commands.get(cmd)) {
         if(cmd === "s") {
           lastDL = message
+        }
+        if(cmd === "del") {
+          if(message.author.id !== config.ownerId) {
+            message.reply("no permission")
+            return
+          }
         }
         commands.get(cmd)(client, message, args)
       } else if(cmd === "help") {

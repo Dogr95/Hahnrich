@@ -16,14 +16,16 @@ module.exports = class MediaPlayer {
           this.now_playing = this.queue[0]
           this.queue.splice(0, 1)
           if(typeof this.connection !== "undefined") {
-            const dispatcher = this.connection.play(ytdl(this.now_playing))
+            const dispatcher = this.connection.play(ytdl(this.now_playing, {
+              filter: "audioonly"
+            }))
             dispatcher.on('finish', () => {
               this.next()
             })
           }
         } else {
           this.now_playing = this.queue[0]
-          if(this.now_playing.startsWith('https://youtube.com/watch')) {
+          if(this.now_playing.startsWith('https://youtube.com/watch') || this.now_playing.startsWith('https://www.youtube.com/watch')) {
             this.currentLength = info.videoDetails.lengthSeconds;
           } else {
             meta.parseFile(__dirname + "/songs/" + this.now_playing).then((data) => {

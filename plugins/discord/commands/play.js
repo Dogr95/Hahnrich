@@ -2,7 +2,12 @@ const F = require('fs')
 module.exports = function(client, message, args) {
   const mediaPlayer = client[message.guild.id]
   if(args[0] && (args[0].startsWith('https://youtube.com/watch') || args[0].startsWith('https://www.youtube.com/watch'))) {
-    mediaPlayer.queue.push(args[0]);
+    if(args[1] && args[1].toLowerCase() === "force") {
+      mediaPlayer.queue.unshift(args[0]);
+      if(mediaPlayer.connection) mediaPlayer.next();
+    } else {
+      mediaPlayer.queue.push(args[0]);
+    }
     // connect to channel if not done yet
     if(!mediaPlayer.connection) {
       require('./join.js')(client, message, args)
@@ -18,6 +23,6 @@ module.exports = function(client, message, args) {
       mediaPlayer.next()
     }
   } else {
-
+    message.reply("invalid link format")
   }
 }

@@ -8,12 +8,14 @@ module.exports = function(client, message, args) {
     .then((info) => {
       if(info.videoDetails.lengthSeconds <= MAXLENGTH) {
         info.videoDetails.title = info.videoDetails.title.replace(/[^a-z0-9 ]/gi, "").replace(/[ ]/gi, "_") + ".mp3"
-        ytdl(args[0], {
-          filter: "audioonly"
-        })
-        .pipe(F.createWriteStream(__dirname + `/../songs/${info.videoDetails.title}`))
-        .on("finish", () => {
-          mediaPlayer.queue.push(info.videoDetails.title);
+
+        function play() {
+          if(args[1] && args[1].toLowerCase() === "force") {
+            mediaPlayer.queue.unshift(info.videoDetails.title);
+            if(mediaPlayer.connection) mediaPlayer.next();
+          } else {
+            mediaPlayer.queue.push(info.videoDetails.title);
+          }
           // connect to channel if not done yet
           if(!mediaPlayer.connection) {
             require('./join.js')(client, message, args)
@@ -28,7 +30,21 @@ module.exports = function(client, message, args) {
           } else if(mediaPlayer.now_playing === '') {
             mediaPlayer.next()
           } 
+        }
+
+        try {
+          if(F.existsSync(__dirname + `/../songs/${info.videoDetails.title}`)) {
+            play();
+            return;
+          }
+        } catch(e) {
+          console.error(e)
+        }
+        ytdl(args[0], {
+          filter: "audioonly"
         })
+        .pipe(F.createWriteStream(__dirname + `/../songs/${info.videoDetails.title}`))
+        .on("finish", play)
         .on("error", (e) => {
           console.log(e)
         })
@@ -39,19 +55,6 @@ module.exports = function(client, message, args) {
     .catch((e) => {
       console.log(e)
     })
-    //ytdl(args[0]).pipe(F.createWriteStream('songs/'))
-    // connect to channel if not done yet
-    // if(!mediaPlayer.connection) {
-    //   require('./join.js')(client, message, args)
-    //   .then((con) => {
-    //     mediaPlayer.connection = con
-    //     mediaPlayer.next()
-    //   })
-    //   .catch((err) => {
-    //     console.log("error:", err)
-    //     message.reply('failed joining')
-    //   })
-    // }
   } else {
 
   }
