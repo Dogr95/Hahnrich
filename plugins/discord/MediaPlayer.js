@@ -47,7 +47,7 @@ module.exports = class MediaPlayer {
           }
           this.queue.splice(0, 1)
           if(typeof this.connection !== "undefined") {
-            let n = __dirname + "/songs/" + this.now_playing;
+            let n = __dirname + "/songs/" + `\"${this.now_playing}\"`;
             if(this.now_playing.startsWith('https://youtube.com/watch')) {
               n = this.now_playing;
             }

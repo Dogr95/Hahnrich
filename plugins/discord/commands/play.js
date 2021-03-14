@@ -14,6 +14,8 @@ module.exports = function(client, message, args) {
         console.log("error:", err)
         message.reply('failed joining')
       })
+    } else if(mediaPlayer.now_playing === '') {
+      mediaPlayer.next()
     }
   } else {
 
