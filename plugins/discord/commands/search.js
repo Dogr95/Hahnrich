@@ -20,7 +20,11 @@ module.exports = function(client, message, args) {
             .setAuthor('Hahnrich', 'https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/cb/cb9a41873f2065b8010afa7584803d283dd7e6ad_full.jpg', 'https://alleshusos.de')
             .setFooter(`Results[${results.length}]:\n${fancyResults.slice(0, 5).join("\n")}`)
     message.reply(embed).then(msg => {
-        const possibleReactions = ['1⃣', '2⃣', '3⃣', '4⃣', '5⃣', '😱'];
+        let possibleReactions = ['1⃣', '2⃣', '3⃣', '4⃣', '5⃣'];
+        possibleReactions = possibleReactions.splice(0, Math.min(results.length, possibleReactions.length));
+        if(possibleReactions.length > 0) {
+            possibleReactions.push('😱');
+        }
         possibleReactions.forEach(r => {
             msg.react(r);
         })
@@ -29,7 +33,7 @@ module.exports = function(client, message, args) {
             return possibleReactions.includes(reaction.emoji.name) && user.id === message.author.id;
         };
         
-        msg.awaitReactions(filter, { max: 1, time: 60000, errors: ['time'] })
+        if(possibleReactions.length > 0) msg.awaitReactions(filter, { max: 1, time: 60000, errors: ['time'] })
             .then(collected => {
                 const reaction = collected.first();
 
@@ -51,8 +55,7 @@ module.exports = function(client, message, args) {
                     case "5⃣":
                         filesToPush.push(results[4]);
                         break;
-                      mediaPlayer.next()
-                      case "😱":
+                    case "😱":
                         filesToPush = filesToPush.concat(results);
                         break;
                 }
@@ -74,7 +77,9 @@ module.exports = function(client, message, args) {
                 }
             })
             .catch(collected => {
-                message.reply('Wrong reaction. Fuck you.');
+                // if time runs out delete messages
+                message.delete();
+                msg.delete();
             });
     })
   } else {
