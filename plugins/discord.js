@@ -59,7 +59,7 @@ client.on('ready', () => {
 })
 
 client.on('message', message => {
-  if(message.channel['type'] !== 'dm' && message.channel.name.includes("bot")) {
+  if(message.channel['type'] !== 'dm' && message.channel.name.includes("bot") || message.channel.name.includes("innocent")) {
     if(message.attachments.first()) {
       message.attachments.each(file => {
         console.log(file)
