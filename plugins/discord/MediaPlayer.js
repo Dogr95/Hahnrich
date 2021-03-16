@@ -4,7 +4,7 @@ module.exports = class MediaPlayer {
   now_playing = ""
   queue = []
   connection = undefined
-  currentLength = 0
+  currentLength = "0:00"
   leaveTimer = undefined
   next = function() {
     if(this.leaveTimer) {
@@ -16,6 +16,16 @@ module.exports = class MediaPlayer {
           this.now_playing = this.queue[0]
           this.queue.splice(0, 1)
           if(typeof this.connection !== "undefined") {
+            ytdl.getInfo(this.now_playing)
+            .then((info) => {
+              const length = {
+                minutes: 0,
+                seconds: Math.floor(info.videoDetails.lengthSeconds),
+              }
+              length.minutes = Math.floor(length.seconds / 60);
+              length.seconds %= 60;
+              this.currentLength = `${length.minutes}:` + (length.seconds < 10 ? `0${length.seconds}` : length.seconds);
+            })
             const dispatcher = this.connection.play(ytdl(this.now_playing, {
               filter: "audioonly"
             }))
@@ -28,23 +38,15 @@ module.exports = class MediaPlayer {
           if(this.now_playing.startsWith('https://youtube.com/watch') || this.now_playing.startsWith('https://www.youtube.com/watch')) {
             this.currentLength = info.videoDetails.lengthSeconds;
           } else {
-            meta.parseFile(__dirname + "/songs/" + this.now_playing).then((data) => {
-              let length = {
-                total: parseInt(data.format.duration),
-                after: parseInt(data.format.duration),
+            meta.parseFile(__dirname + "/songs/" + this.now_playing,
+            { duration: true }).then((data) => {
+              const length = {
                 minutes: 0,
-                seconds: 0
+                seconds: Math.floor(data.format.duration),
               }
-              length.minutes = Math.floor(length.after / 60)
-              length.after = Math.floor(length.after - (length.minutes * 60) )
-              length.seconds = length.after
-              let lengthformat = ""
-              if(length.seconds > 10) {
-                lengthformat = `${length.minutes}:${length.seconds}`
-              } else {
-                lengthformat = `${length.minutes}:0${length.seconds}`
-              }
-              this.currentLength = lengthformat
+              length.minutes = Math.floor(length.seconds / 60);
+              length.seconds %= 60;
+              this.currentLength = `${length.minutes}:` + (length.seconds < 10 ? `0${length.seconds}` : length.seconds);
             })
           }
           this.queue.splice(0, 1)

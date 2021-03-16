@@ -2,6 +2,7 @@ require('../MessageHandler.js');
 const discord = require('discord.js');
 const client = new discord.Client();
 const dhl = require('postman-request');
+const { spawn } = require('child_process');
 const F = require('fs');
 let lastDL;
 const ytdl = require('ytdl-core')
@@ -70,21 +71,53 @@ client.on('message', message => {
           })
           .pipe(F.createWriteStream(__dirname + "/discord/songs/" + file.name))
             .on('finish', () => {
-              client[message.guild.id].queue.push(file.name)
-              if(client[message.guild.id].connection) {
-                if(!client[message.guild.id].now_playing || client[message.guild.id].now_playing === '') {
-                  client[message.guild.id].next()
-                }
-              } else {
-                require('./discord/commands/join.js')(client, message, [])
-                .then((con) => {
-                  client[message.guild.id].connection = con
-                  client[message.guild.id].next()
-                })
-                .catch((err) => {
-                  message.reply(err)
-                })
-              }
+              const file_ = __dirname + `/discord/songs/${file.name}`
+              const child = spawn("ffmpeg", [
+                "-y",
+                "-i",
+                `${file_}`,
+                "-af",
+                "loudnorm=I=-16:LRA=11:TP=-1.5",
+                `${file_.split(".mp3")[0]}.tmp.mp3`
+              ])
+              child.stdout.on('data', (data) => {
+                  // uncomment to debug ffmpeg output
+                  //console.log(`stdout: ${data}`);
+              });
+                
+              child.stderr.on('data', (data) => {
+                  // uncomment to debug ffmpeg output
+                  //console.error(`stderr: ${data}`);
+              });
+                
+              child.on('close', (code) => {
+                  if(code === 0) {
+                      F.rename((`${file_.split(".mp3")[0]}.tmp.mp3`), (`${file_}`), (err) => {
+                          if(err) {
+                            console.log(err);
+                          } else {
+                            client[message.guild.id].queue.push(file.name)
+                            if(client[message.guild.id].connection) {
+                              if(!client[message.guild.id].now_playing || client[message.guild.id].now_playing === '') {
+                                client[message.guild.id].next()
+                              }
+                            } else {
+                              require('./discord/commands/join.js')(client, message, [])
+                              .then((con) => {
+                                client[message.guild.id].connection = con
+                                client[message.guild.id].next()
+                              })
+                              .catch((err) => {
+                                message.reply(err)
+                              })
+                          }
+                        }
+                      })
+                  } else {
+                      console.log(code, "Failed converting: "+file_)
+                  }
+              });
+              
             })
         }
       })
@@ -95,6 +128,7 @@ client.on('message', message => {
       args.splice(0, 1)
       if(commands.get(cmd)) {
         if(cmd === "s") {
+          if(!message.channel.name.includes("innocent")) return;
           lastDL = message
         }
         if(cmd === "del") {

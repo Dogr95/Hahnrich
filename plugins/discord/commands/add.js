@@ -1,5 +1,6 @@
 const F = require('fs')
 const ytdl = require('ytdl-core')
+const { spawn } = require('child_process');
 const MAXLENGTH = 360;
 module.exports = function(client, message, args) {
   const mediaPlayer = client[message.guild.id]
@@ -44,7 +45,41 @@ module.exports = function(client, message, args) {
           filter: "audioonly"
         })
         .pipe(F.createWriteStream(__dirname + `/../songs/${info.videoDetails.title}`))
-        .on("finish", play)
+        .on("finish", () => {
+          const file = __dirname + `/../songs/${info.videoDetails.title}`
+          const child = spawn("ffmpeg", [
+            "-y",
+            "-i",
+            `${file}`,
+            "-af",
+            "loudnorm=I=-16:LRA=11:TP=-1.5",
+            `${file.split(".mp3")[0]}.tmp.mp3`
+          ])
+          child.stdout.on('data', (data) => {
+              // uncomment to debug ffmpeg output
+              //console.log(`stdout: ${data}`);
+          });
+            
+          child.stderr.on('data', (data) => {
+              // uncomment to debug ffmpeg output
+              //console.error(`stderr: ${data}`);
+          });
+            
+          child.on('close', (code) => {
+              if(code === 0) {
+                  F.rename((`${file.split(".mp3")[0]}.tmp.mp3`), (`${file}`), (err) => {
+                      if(err) {
+                        console.log(err);
+                      } else {
+                        play();
+                      }
+                  })
+              } else {
+                  console.log(code, "Failed converting: "+file)
+              }
+          });
+          
+        })
         .on("error", (e) => {
           console.log(e)
         })
