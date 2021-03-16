@@ -24,7 +24,7 @@ process.on('message', (msg) => {
   for(let i = 0; i < msg.length; i++) {
     if(msg[i].includes("https://clips.twitch.tv/") || msg[i].includes("clip/")) {
       let id = msg[i].replace('https://clips.twitch.tv/', '');
-      id = id.split("clip/")[1].split("?")[0];
+      id = id.split("clip/")[1] ? id.split("clip/")[1].split("?")[0] : id;
       twitch.helix.clips.getClipById(id)
       .then((clip) => {
         let link = clip.thumbnailUrl.split('-preview')[0]+'.mp4'
