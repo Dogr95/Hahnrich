@@ -60,7 +60,10 @@ client.on('ready', () => {
 })
 
 client.on('message', message => {
-  if(message.channel['type'] !== 'dm' && message.channel.name.includes("bot") || message.channel.name.includes("innocent")) {
+  if(message.author === client.user) return;
+  if(message.channel.name.includes("bot") && client[message.guild.id].minigame && client[message.guild.id].minigame.status === "active") {
+    client[message.guild.id].minigame.registerMessage(message);
+  } else if(message.channel['type'] !== 'dm' && message.channel.name.includes("bot") || message.channel.name.includes("innocent")) {
     if(message.attachments.first()) {
       message.attachments.each(file => {
         console.log(file)

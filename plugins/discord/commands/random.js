@@ -5,8 +5,8 @@ module.exports = function(client, message, args) {
   if(!Number.isNaN(parseInt(args[0]))) {
     args[0] = parseInt(args[0])
   } else {
-    // otherwise set it to 5
-    args[0] = 5
+    // otherwise set it to 1
+    args[0] = 1
   }
   // load songs
   const songs = F.readdirSync(__dirname + "/../songs")

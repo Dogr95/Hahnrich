@@ -4,6 +4,7 @@ module.exports = class MediaPlayer {
   now_playing = ""
   queue = []
   connection = undefined
+  minigame = undefined
   currentLength = "0:00"
   leaveTimer = undefined
   next = function() {

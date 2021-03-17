@@ -1,6 +1,6 @@
 {
   "name": "hahnrich",
-  "version": "4.2.1",
+  "version": "4.2.2",
   "description": "the latest rework of my hahnrich bot",
   "main": "index.js",
   "scripts": {
@@ -15,10 +15,17 @@
     "discord.js": "^12.5.1",
     "express": "^4.17.1",
     "music-metadata": "^7.8.1",
+    "node": "^15.10.0",
+    "npm": "^7.6.3",
     "postman-request": "^2.88.1-postman.28",
     "twitch": "^4.5.1",
+    "twitch-auth": "^4.5.1",
     "twitch-chat-client": "^4.5.1",
     "twitch-pubsub-client": "^4.5.1",
     "ytdl-core": "^4.5.0"
+  },
+  "engines": {
+    "node": ">=0.10.3 <15"
   }
 }
+  
