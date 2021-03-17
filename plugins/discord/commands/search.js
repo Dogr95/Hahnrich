@@ -7,7 +7,13 @@ module.exports = function(client, message, args) {
     let results = [];
     let fancyResults = [];
     let i = 1;
+
+    let indexOfForce = args.indexOf("force");
+    forced = (indexOfForce === args.length - 1);
+    args.splice(indexOfForce, 1);
+
     F.readdirSync(__dirname + `/../songs/`).forEach(file => {
+        console.log(file.toLowerCase() + "=" + args.join(" "), file.toLowerCase().includes(args.join(' ').toLowerCase()))
         if(file.toLowerCase().includes(args.join(' ').toLowerCase())) {
             results.push(file);
             fancyResults.push((i++) +": "+ file);
@@ -60,7 +66,12 @@ module.exports = function(client, message, args) {
                         break;
                 }
                 console.log(filesToPush);
-                mediaPlayer.queue = mediaPlayer.queue.concat(filesToPush);
+                if(forced) {
+                    mediaPlayer.queue = [].concat(filesToPush, mediaPlayer.queue);
+                    if(mediaPlayer.connection) mediaPlayer.next();
+                } else {
+                    mediaPlayer.queue = mediaPlayer.queue.concat(filesToPush);
+                }
                 console.log(mediaPlayer.queue)
                 if(!mediaPlayer.connection) {
                     require('./join.js')(client, message, args)
