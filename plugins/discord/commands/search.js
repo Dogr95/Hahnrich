@@ -13,7 +13,6 @@ module.exports = function(client, message, args) {
     args.splice(indexOfForce, 1);
 
     F.readdirSync(__dirname + `/../songs/`).forEach(file => {
-        console.log(file.toLowerCase() + "=" + args.join(" "), file.toLowerCase().includes(args.join(' ').toLowerCase()))
         if(file.toLowerCase().includes(args.join(' ').toLowerCase())) {
             results.push(file);
             fancyResults.push((i++) +": "+ file);
@@ -65,14 +64,12 @@ module.exports = function(client, message, args) {
                         filesToPush = filesToPush.concat(results);
                         break;
                 }
-                console.log(filesToPush);
                 if(forced) {
                     mediaPlayer.queue = [].concat(filesToPush, mediaPlayer.queue);
                     if(mediaPlayer.connection) mediaPlayer.next();
                 } else {
                     mediaPlayer.queue = mediaPlayer.queue.concat(filesToPush);
                 }
-                console.log(mediaPlayer.queue)
                 if(!mediaPlayer.connection) {
                     require('./join.js')(client, message, args)
                     .then((con) => {
