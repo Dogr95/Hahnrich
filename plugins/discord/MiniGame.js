@@ -44,10 +44,8 @@ module.exports = class MiniGame {
 				this.mediaPlayer.connection = con;
 			}
 			const songs = fs.readdirSync(__dirname + "/songs");
-			let song = songs[Math.floor(Math.random() * songs.length)];
-			song = song.replace(/[^a-z0-9 ]/gi, "").replace(/[ ]/gi, "_") + ".mp3";
-			console.log(typeof song, song)
-			this.answer = `${song}`.replaceAll(".mp3", "");
+			const song = songs[Math.floor(Math.random() * songs.length)];
+			this.answer = song;
 
 			let seekTo = 0;
 			const metadata = await meta.parseFile(__dirname + "/songs/" + `${song}`, {
