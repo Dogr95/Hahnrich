@@ -1,4 +1,3 @@
-const { DiscordAPIError } = require('discord.js');
 const F = require('fs')
 const discord = require('discord.js')
 module.exports = function(client, message, args) {
@@ -10,7 +9,7 @@ module.exports = function(client, message, args) {
 
     let indexOfForce = args.indexOf("force");
     forced = (indexOfForce === args.length - 1);
-    args.splice(indexOfForce, 1);
+    if(forced) args.splice(indexOfForce, 1);
 
     F.readdirSync(__dirname + `/../songs/`).forEach(file => {
         if(file.toLowerCase().includes(args.join(' ').toLowerCase())) {

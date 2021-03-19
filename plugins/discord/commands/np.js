@@ -21,6 +21,7 @@ module.exports = async function (client, message, args) {
 		streamtimeformat = "0:00";
 	}
 	let queue = "";
+	const temp = await message.reply("fetching youtube titles in queue, please wait...");
 	for (let i = 0; i < mediaPlayer.queue.length && i < 5; i++) {
 		let name = "";
 		if (checkYoutube(mediaPlayer.queue[i])) {
@@ -29,7 +30,7 @@ module.exports = async function (client, message, args) {
 			name = mediaPlayer.queue[i];
 		}
 
-		queue += `[${i}] ` + name + "\n";
+		queue += `[${i+1}] ` + name + "\n";
 	}
 
 	let currentSong = "";
@@ -61,7 +62,8 @@ module.exports = async function (client, message, args) {
 			"https://alleshusos.de"
 		)
 		.addField(await currentSong, `${streamtimeformat}/${length}`)
-		.setFooter(`Queue[${mediaPlayer.queue.length}]:\n${queue}`);
+		.setFooter(`Queue[${mediaPlayer.queue.length}]:\n${queue}\nTo skip to a specific song in queue: !skip [number]`);
+	temp.delete();
 	message.reply(embed);
 };
 

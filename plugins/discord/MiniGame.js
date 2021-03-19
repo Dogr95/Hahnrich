@@ -18,7 +18,10 @@ module.exports = class MiniGame {
 	async start(message, repeat = false) {
 		if (this.status !== "active") {
 			if (!repeat) message.delete();
+			this.guesses = new Map();
 			this.status = "active";
+			this.mediaPlayer.now_playing = "Queue paused while MiniGame is active.";
+			this.mediaPlayer.currentLength = "no";
 			this.embed = new discord.MessageEmbed()
 				.setColor("#d10202")
 				.setTitle("Minigame:")
@@ -39,7 +42,6 @@ module.exports = class MiniGame {
 					{}
 				);
 				this.mediaPlayer.connection = con;
-				this.mediaPlayer.next();
 			}
 			const songs = fs.readdirSync(__dirname + "/songs");
 			const song = songs[Math.floor(Math.random() * songs.length)];
@@ -72,7 +74,7 @@ module.exports = class MiniGame {
 				this.embed.setTitle(
 					`Minigame[${Math.ceil(
 						20 - (new Date().getTime() - this.timer.getTime()) / 1000
-					)}]:`
+					)}s]:`
 				);
 				this.embedMessage.edit(this.embed);
 			}, 5000);
@@ -91,6 +93,11 @@ module.exports = class MiniGame {
 		});
 		this.embed.setTitle("Minigame:");
 		this.dispatcher.resume();
+		this.dispatcher.on("finish", () => {
+			if (this.mediaPlayer.connection) {
+				this.mediaPlayer.next();
+			}
+		});
 		this.embed.addField("Time is up!", str + "The answer was: " + this.answer);
 		this.embed.setFooter("Want to play again?");
 		this.embedMessage.edit(this.embed);
