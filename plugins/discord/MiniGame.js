@@ -45,6 +45,7 @@ module.exports = class MiniGame {
 			}
 			const songs = fs.readdirSync(__dirname + "/songs");
 			const song = songs[Math.floor(Math.random() * songs.length)];
+			console.log(typeof song, song)
 			this.answer = `${song}`.replaceAll(".mp3", "");
 
 			let seekTo = 0;
