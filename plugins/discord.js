@@ -65,6 +65,7 @@ client.on("ready", () => {
 client.on("message", (message) => {
 	if (message.author === client.user) return;
 	if (
+		message.channel["type"] !== "dm" && 
 		message.channel.name.includes("bot") &&
 		client[message.guild.id].minigame &&
 		client[message.guild.id].minigame.status === "active"

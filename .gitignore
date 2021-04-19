@@ -3,6 +3,8 @@ node_modules/
 config.json
 plugins/discord/songs/*
 plugins/discord/clips/*
+plugins/discord/leaderboard.json
+plugins/discord/trends.json
 latest.log
 license
 steal.js
