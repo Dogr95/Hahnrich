@@ -31,7 +31,7 @@ module.exports = class MiniGame {
 				.setAuthor(
 					"Hahnrich",
 					"https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/cb/cb9a41873f2065b8010afa7584803d283dd7e6ad_full.jpg",
-					"https://alleshusos.de"
+					"https://karlology.de"
 				)
 				.setFooter("Guess the current song by sending a message below!");
 			this.embedMessage = await message.channel.send(this.embed);

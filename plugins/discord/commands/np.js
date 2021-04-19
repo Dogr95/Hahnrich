@@ -59,7 +59,7 @@ module.exports = async function (client, message, args) {
 		.setAuthor(
 			"Hahnrich",
 			"https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/cb/cb9a41873f2065b8010afa7584803d283dd7e6ad_full.jpg",
-			"https://alleshusos.de"
+			"https://karlology.de"
 		)
 		.addField(await currentSong, `${streamtimeformat}/${length}`)
 		.setFooter(`Queue[${mediaPlayer.queue.length}]:\n${queue}\nTo skip to a specific song in queue: !skip [number]`);

@@ -63,7 +63,7 @@ async function searchForSong(args, key, message, mediaPlayer, client) {
           .setAuthor(
             "Hahnrich",
             "https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/cb/cb9a41873f2065b8010afa7584803d283dd7e6ad_full.jpg",
-            "https://alleshusos.de"
+            "https://karlology.de"
           )
           .setFooter(`Results[${results.length}]:\n${answer}`);
         message.reply(embed).then((msg) => {

@@ -21,7 +21,7 @@ module.exports = function(client, message, args) {
             .setColor('#d10202')
             .setTitle('Search results:')
             .setURL('https://zap-hosting.com/de/shop/donation/b46e5e7b07106dad59febaf3b66fd5e5/')
-            .setAuthor('Hahnrich', 'https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/cb/cb9a41873f2065b8010afa7584803d283dd7e6ad_full.jpg', 'https://alleshusos.de')
+            .setAuthor('Hahnrich', 'https://steamcdn-a.akamaihd.net/steamcommunity/public/images/avatars/cb/cb9a41873f2065b8010afa7584803d283dd7e6ad_full.jpg', 'https://karlology.de')
             .setFooter(`Results[${results.length}]:\n${fancyResults.slice(0, 5).join("\n")}`)
     message.reply(embed).then(msg => {
         let possibleReactions = ['1⃣', '2⃣', '3⃣', '4⃣', '5⃣'];
