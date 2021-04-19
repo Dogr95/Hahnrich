@@ -7,7 +7,7 @@ module.exports = function(client, message, args) {
     let fancyResults = [];
     let i = 1;
 
-    let indexOfForce = args.indexOf("force");
+    let indexOfForce = args.lastIndexOf("force");
     forced = (indexOfForce === args.length - 1);
     if(forced) args.splice(indexOfForce, 1);
 

@@ -7,7 +7,7 @@ const MAXLENGTH = 360;
 module.exports = function (client, message, args, key) {
 	const mediaPlayer = client[message.guild.id];
 
-	let indexOfForce = args.indexOf("force");
+	let indexOfForce = args.lastIndexOf("force");
 	forced = indexOfForce === args.length - 1;
 	if (forced) args.splice(indexOfForce, 1);
 
