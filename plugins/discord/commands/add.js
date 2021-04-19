@@ -16,7 +16,7 @@ module.exports = function (client, message, args, key) {
 		(args[0].startsWith("https://youtube.com/watch") ||
 			args[0].startsWith("https://www.youtube.com/watch"))
 	) {
-		downloadSong(args[0], key).then(file => {
+		downloadSong(message, args[0]).then(file => {
 			if (forced) {
 				mediaPlayer.queue.unshift(file);
 			} else {
@@ -26,14 +26,6 @@ module.exports = function (client, message, args, key) {
 		});
 	} else if (args[0]) {
     searchForSong(args, key, message, mediaPlayer, client).then(res => console.log(res))
-		// downloadSong(args, key, message).then((files) => {
-		// 	if (forced) {
-		// 		mediaPlayer.queue = files.concat(mediaPlayer);
-		// 	} else {
-		// 		mediaPlayer.queue = mediaPlayer.queue.concat(files);
-		// 	}
-		// 	play(client, message, mediaPlayer);
-		// });
 	}
 };
 
@@ -42,6 +34,7 @@ async function searchForSong(args, key, message, mediaPlayer, client) {
     let opts = {
       maxResults: 5,
       key: key,
+      type: "video"
     };
     search(args.join(" "), opts, (err, results) => {
       if (err) {
@@ -105,28 +98,28 @@ async function searchForSong(args, key, message, mediaPlayer, client) {
   
                 switch (reaction.emoji.name) {
                   case "1⃣":
-                    path = await downloadSong(results[0].link)
+                    path = await downloadSong(message, results[0].link)
                     filesToPush.push(await path);
                     break;
                   case "2⃣":
-                    path = await downloadSong(results[1].link)
+                    path = await downloadSong(message, results[1].link)
                     filesToPush.push(await path);
                     break;
                   case "3⃣":
-                    path = await downloadSong(results[2].link)
+                    path = await downloadSong(message, results[2].link)
                     filesToPush.push(await path);
                     break;
                   case "4⃣":
-                    path = await downloadSong(results[3].link)
+                    path = await downloadSong(message, results[3].link)
                     filesToPush.push(await path);
                     break;
                   case "5⃣":
-                    path = await downloadSong(results[4].link)
+                    path = await downloadSong(message, results[4].link)
                     filesToPush.push(await path);
                     break;
                   case "😱":
                     for (let i = 0; i < results.length; i++) {
-                      path = await downloadSong(results[i].link)
+                      path = await downloadSong(message, results[i].link)
                       filesToPush.push(await path);
                     }
                     break;
@@ -170,7 +163,7 @@ async function searchForSong(args, key, message, mediaPlayer, client) {
   });
 }
 
-async function downloadSong(args) {
+async function downloadSong(message, args) {
 	return new Promise((resolve, reject) => {
     ytdl
       .getInfo(args)
@@ -192,58 +185,63 @@ async function downloadSong(args) {
             reject(e);
             console.error(e);
           }
-          ytdl(args, {
-            filter: "audioonly",
-          })
-            .pipe(
-              F.createWriteStream(
-                __dirname + `/../songs/${info.videoDetails.title}`
-              )
-            )
-            .on("finish", () => {
-              const file = __dirname + `/../songs/${info.videoDetails.title}`;
-              const child = spawn("ffmpeg", [
-                "-y",
-                "-i",
-                `${file}`,
-                "-af",
-                "loudnorm=I=-16:LRA=11:TP=-1.5",
-                `${file.split(".mp3")[0]}.tmp.mp3`,
-              ]);
-              child.stdout.on("data", (data) => {
-                // uncomment to debug ffmpeg output
-                // console.log(`stdout: ${data}`);
-              });
-
-              child.stderr.on("data", (data) => {
-                // uncomment to debug ffmpeg output
-                // console.error(`stderr: ${data}`);
-              });
-
-              child.on("close", (code) => {
-                if (code === 0) {
-                  F.rename(
-                    `${file.split(".mp3")[0]}.tmp.mp3`,
-                    `${file}`,
-                    (err) => {
-                      if (err) {
-                        reject(err);
-                        console.log(err);
-                      } else {
-                        resolve(info.videoDetails.title);
-                      }
-                    }
-                  );
-                } else {
-                  reject(code, "Failed converting: " + file);
-                  console.log(code, "Failed converting: " + file);
-                }
-              });
+          let title = info.videoDetails.title;
+          message.reply("downloading: "+title).then(progress => {
+            ytdl(args, {
+              filter: "audioonly",
             })
-            .on("error", (e) => {
-              console.log(e);
-              reject(e);
-            });
+              .pipe(
+                F.createWriteStream(
+                  __dirname + `/../songs/${info.videoDetails.title}`
+                )
+              )
+              .on("finish", () => {
+                progress.edit("normalizing audio for: " + title);
+                const file = __dirname + `/../songs/${info.videoDetails.title}`;
+                const child = spawn("ffmpeg", [
+                  "-y",
+                  "-i",
+                  `${file}`,
+                  "-af",
+                  "loudnorm=I=-16:LRA=11:TP=-1.5",
+                  `${file.split(".mp3")[0]}.tmp.mp3`,
+                ]);
+                child.stdout.on("data", (data) => {
+                  // uncomment to debug ffmpeg output
+                  // console.log(`stdout: ${data}`);
+                });
+  
+                child.stderr.on("data", (data) => {
+                  // uncomment to debug ffmpeg output
+                  // console.error(`stderr: ${data}`);
+                });
+  
+                child.on("close", (code) => {
+                  progress.edit("done: " + title);
+                  if (code === 0) {
+                    F.rename(
+                      `${file.split(".mp3")[0]}.tmp.mp3`,
+                      `${file}`,
+                      (err) => {
+                        if (err) {
+                          reject(err);
+                          console.log(err);
+                        } else {
+                          resolve(info.videoDetails.title);
+                        }
+                      }
+                    );
+                  } else {
+                    reject(code, "Failed converting: " + file);
+                    console.log(code, "Failed converting: " + file);
+                  }
+                });
+              })
+              .on("error", (e) => {
+                console.log(e);
+                reject(e);
+              });
+          })
         } else {
           reject(
             `The requested video is too long. Maxlength is ${MAXLENGTH} seconds (${

@@ -1,5 +1,5 @@
 const search = require('youtube-search');
-const discord = require('discord.js')
+const discord = require('discord.js');
 module.exports = function(client, message, args, key) {
   const mediaPlayer = client[message.guild.id]
   if(args[0] && (args[0].startsWith('https://youtube.com/watch') || args[0].startsWith('https://www.youtube.com/watch'))) {
@@ -26,7 +26,8 @@ module.exports = function(client, message, args, key) {
   } else if(args[0]) {
     let opts = {
       maxResults: 5,
-      key: key
+      key: key,
+      type: "video"
     }
 
     let indexOfForce = args.lastIndexOf("force");
