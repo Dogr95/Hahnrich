@@ -72,9 +72,9 @@ client.on("message", (message) => {
 	) {
 		client[message.guild.id].minigame.registerMessage(message);
 	} else if (
-		(message.channel["type"] !== "dm" &&
-			message.channel.name.includes("bot")) ||
-		message.channel.name.includes("innocent")
+		message.channel["type"] !== "dm" &&
+			(message.channel.name.includes("bot") ||
+		message.channel.name.includes("innocent"))
 	) {
 		if (message.attachments.first()) {
 			message.attachments.each((file) => {
