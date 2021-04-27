@@ -123,9 +123,31 @@ app.post('/game/:game', (req, res) => {
       game: req.params.game,
       type: "live",
       limit: 25
-    }).then((result) => {
+    }).then((results) => {
       console.log('sending result')
-      res.json(result)
+      let newData = []
+      for(let result of results.data) {
+          result = {
+              id: result.id,
+              user_id: result.userId,
+              user_login: result.userName,
+              user_name: result.userDisplayName,
+              game_id: result.gameId,
+              game_name: result.gameName,
+              community_ids: null,
+              type: result.type,
+              title: result.title,
+              viewer_count: result.viewers,
+              started_at: result.startDate,
+              language: result.language,
+              thumbnail_url: result.thumbnailUrl,
+              tag_ids: result.tagIds,
+          }
+          newData.push(result)
+      }
+      results.data = newData;
+      console.log(results)
+      res.json(results)
     }).catch((e) => {
       console.log(e)
       res.send(e)
@@ -141,6 +163,22 @@ app.post('/streams/:id', (req, res) => {
     twitch.helix.streams.getStreamByUserId(id)
     .then((result) => {
       console.log('sending result')
+      result = {
+          id: result.id,
+          user_id: result.userId,
+          user_login: result.userName,
+          user_name: result.userDisplayName,
+          game_id: result.gameId,
+          game_name: result.gameName,
+          community_ids: null,
+          type: result.type,
+          title: result.title,
+          viewer_count: result.viewers,
+          started_at: result.startDate,
+          language: result.language,
+          thumbnail_url: result.thumbnailUrl,
+          tag_ids: result.tagIds,
+      }
       res.json(result)
     }).catch((e) => {
       console.log(e)
@@ -156,11 +194,23 @@ app.post('/user/:name', (req, res) => {
   if(req.body.key === config.key) {
     twitch.helix.users.getUserByName(name)
     .then((result) => {
-      console.log('sending result')
-      res.json(result)
+        result = {
+            id: result.id,
+            login: result.login,
+            display_name: result.displayName,
+            description: result.description,
+            type: result.type,
+            broadcaster_type: result.broadcasterType,
+            profile_image_url: result.profilePictureUrl,
+            offline_image_url: result.offlinePlaceholderUrl,
+            view_count: result.views,
+            created_at: result.creationDate
+        }
+        console.log('sending result')
+        res.json(result)
     }).catch((e) => {
-      console.log(e)
-      res.send(e)
+        console.log(e)
+        res.send(e)
     })
   } else {
     res.send({"error": 'invalid request'})
@@ -173,7 +223,15 @@ app.post('/channel/:name', (req, res) => {
     twitch.helix.users.getUserByName(name)
     .then(async (result) => {
       result = await twitch.helix.channels.getChannelInfo(result)
-      console.log(result)
+      result = {
+          broadcaster_id: result.id,
+          broadcaster_login: result.name,
+          broadcaster_name: result.displayName,
+          broadcaster_language: result.language,
+          game_id: result.gameId,
+          game_name: result.gameName,
+          title: result.title
+      }
       console.log('sending result')
       res.json(result)
     }).catch((e) => {
@@ -190,11 +248,28 @@ app.post('/followers/:name', (req, res) => {
   if(req.body.key === config.key) {
     twitch.helix.users.getUserByName(name)
     .then(async (result) => {
-      let follows = await twitch.kraken.channels.getChannelFollowers(result.id)
+      let follows = await twitch.kraken.channels.getChannelFollowers(result.id, 0, 100)
       let response = {
         _data: []
       }
       for(let follow of follows) {
+          let result = follow.user;
+          follow = {
+              created_at: follow.followDate,
+              notifications: follow.hasNotifications,
+              user: {
+                  id: result.id,
+                  login: result.login,
+                  display_name: result.displayName,
+                  description: result.description,
+                  type: result.type,
+                  broadcaster_type: result.broadcasterType,
+                  profile_image_url: result.profilePictureUrl,
+                  offline_image_url: result.offlinePlaceholderUrl,
+                  view_count: result.views,
+                  created_at: result.creationDate
+              }
+          }
         response._data.push(follow)
       }
       console.log(response._data)
@@ -221,6 +296,15 @@ app.post('/followsto/:name', (req, res) => {
         _data: []
       }
       for(let user in data) {
+          data[user] = {
+              from_id: data[user].userId,
+              from_login: data[user].userName,
+              from_name: data[user].userDisplayName,
+              to_id: data[user].followedUserId,
+              to_login: data[user].followedUserName,
+              to_name: data[user].followedUserDisplayName,
+              followed_at: data[user].followDate
+          }
         response._data.push(data[user]);
       }
       console.log("RESPONSE")
@@ -235,18 +319,22 @@ app.post('/followsto/:name', (req, res) => {
     res.send({"error": 'invalid request'})
   }
 })
-const https = require('https');
-const privateKey = F.readFileSync(config.ssl.PATHTO_privateKey, 'utf8');
-const certificate = F.readFileSync(config.ssl.PATHTO_certificate, 'utf8');
-const ca = F.readFileSync(config.ssl.PATHTO_ca, 'utf8');
-const credentials = {
-  key: privateKey,
-  cert: certificate,
-  ca: ca
-}
-https.createServer(credentials, app).listen(8080, () => {
-  console.log("Server running on https://localhost:8080");
-});
+// const https = require('https');
+// const privateKey = F.readFileSync(config.ssl.PATHTO_privateKey, 'utf8');
+// const certificate = F.readFileSync(config.ssl.PATHTO_certificate, 'utf8');
+// const ca = F.readFileSync(config.ssl.PATHTO_ca, 'utf8');
+// const credentials = {
+//   key: privateKey,
+//   cert: certificate,
+//   ca: ca
+// }
+// https.createServer(credentials, app).listen(8080, () => {
+//   console.log("Server running on https://localhost:8080");
+// });
+const http = require('http');
+http.createServer(app).listen(6969, () => {
+  console.log("http://localhost:6969")
+})
 
 // start chat client
 const chat = new ChatClient(mainProvider, { channels: config.channels })
