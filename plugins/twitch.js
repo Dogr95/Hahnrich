@@ -319,22 +319,18 @@ app.post('/followsto/:name', (req, res) => {
     res.send({"error": 'invalid request'})
   }
 })
-// const https = require('https');
-// const privateKey = F.readFileSync(config.ssl.PATHTO_privateKey, 'utf8');
-// const certificate = F.readFileSync(config.ssl.PATHTO_certificate, 'utf8');
-// const ca = F.readFileSync(config.ssl.PATHTO_ca, 'utf8');
-// const credentials = {
-//   key: privateKey,
-//   cert: certificate,
-//   ca: ca
-// }
-// https.createServer(credentials, app).listen(8080, () => {
-//   console.log("Server running on https://localhost:8080");
-// });
-const http = require('http');
-http.createServer(app).listen(6969, () => {
-  console.log("http://localhost:6969")
-})
+const https = require('https');
+const privateKey = F.readFileSync(config.ssl.PATHTO_privateKey, 'utf8');
+const certificate = F.readFileSync(config.ssl.PATHTO_certificate, 'utf8');
+const ca = F.readFileSync(config.ssl.PATHTO_ca, 'utf8');
+const credentials = {
+  key: privateKey,
+  cert: certificate,
+  ca: ca
+}
+https.createServer(credentials, app).listen(8080, () => {
+  console.log("Server running on https://localhost:8080");
+});
 
 // start chat client
 const chat = new ChatClient(mainProvider, { channels: config.channels })
