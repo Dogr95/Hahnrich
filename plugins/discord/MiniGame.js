@@ -48,7 +48,7 @@ module.exports = class MiniGame {
 			this.answer = song;
 
 			let seekTo = 0;
-			const metadata = await meta.parseFile(__dirname + "/songs/" + `${song}`, {
+			const metadata = await meta.parseFile(`${__dirname}/songs/${song}`, {
 				duration: true,
 			});
 			seekTo = Math.floor(metadata.format.duration);
@@ -57,7 +57,7 @@ module.exports = class MiniGame {
 			console.log(seekTo);
 
 			this.dispatcher = this.mediaPlayer.connection.play(
-				__dirname + "/songs/" + `\"${song}\"`,
+				`${__dirname}/songs/${song}`,
 				{ seek: seekTo }
 			);
 			setTimeout(() => {
