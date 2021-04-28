@@ -135,7 +135,7 @@ module.exports = class Hahnrich {
       })
       console.log(`Successfully started ${name}`)
     } catch(e) {
-      console.error(`Failed starting ${name} (${e})`)
+      console.error(`Failed starting ${file} (${e})`)
     }
   }
 }
